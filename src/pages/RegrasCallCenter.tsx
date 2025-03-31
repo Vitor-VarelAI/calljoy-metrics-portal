@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,10 +15,18 @@ import {
   Upload, 
   PlusCircle, 
   FileText,
-  Check
+  Check,
+  Search
 } from "lucide-react";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 
 // Tipos para as regras
 type RuleType = "Obrigatória" | "Recomendada";
@@ -61,29 +69,48 @@ const RegrasCallCenter = () => {
     type: "Obrigatória"
   });
 
+  // Estado para validação do formulário
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Estado para regra em edição
   const [editingRule, setEditingRule] = useState<Rule | null>(null);
 
+  // Ordenar regras por tipo: Obrigatórias primeiro, depois Recomendadas
+  const sortedRules = [...rules].sort((a, b) => {
+    if (a.type === "Obrigatória" && b.type === "Recomendada") return -1;
+    if (a.type === "Recomendada" && b.type === "Obrigatória") return 1;
+    return 0;
+  });
+
   // Adicionar nova regra
   const handleAddRule = () => {
+    // Validação do formulário
     if (!newRule.description.trim()) {
-      toast.error("A descrição da regra é obrigatória");
+      setFormError("A descrição da regra é obrigatória");
       return;
     }
 
-    const rule: Rule = {
-      ...newRule,
-      id: Date.now().toString()
-    };
+    setIsSubmitting(true);
+    setFormError(null);
 
-    setRules([...rules, rule]);
-    setNewRule({
-      description: "",
-      category: "Saudação",
-      type: "Obrigatória"
-    });
-    
-    toast.success("Regra adicionada com sucesso");
+    // Simulando um pequeno delay para mostrar o estado de loading
+    setTimeout(() => {
+      const rule: Rule = {
+        ...newRule,
+        id: Date.now().toString()
+      };
+
+      setRules([...rules, rule]);
+      setNewRule({
+        description: "",
+        category: "Saudação",
+        type: "Obrigatória"
+      });
+      
+      toast.success("Regra adicionada com sucesso");
+      setIsSubmitting(false);
+    }, 300);
   };
 
   // Iniciar edição de regra
@@ -94,6 +121,11 @@ const RegrasCallCenter = () => {
   // Salvar edição de regra
   const saveEditRule = () => {
     if (editingRule) {
+      if (!editingRule.description.trim()) {
+        toast.error("A descrição da regra é obrigatória");
+        return;
+      }
+
       setRules(rules.map(rule => rule.id === editingRule.id ? editingRule : rule));
       setEditingRule(null);
       toast.success("Regra atualizada com sucesso");
@@ -157,6 +189,9 @@ const RegrasCallCenter = () => {
           Regras do Call Center
         </h1>
         <p className="text-muted-foreground">Personaliza as regras que os agentes devem seguir nas chamadas</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          Estas regras são verificadas automaticamente nas chamadas analisadas pela IA.
+        </p>
       </div>
 
       {/* Lista de Regras */}
@@ -168,7 +203,7 @@ const RegrasCallCenter = () => {
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="border-b border-border">
                 <TableHead>Descrição</TableHead>
                 <TableHead>Categoria</TableHead>
                 <TableHead>Tipo</TableHead>
@@ -176,8 +211,8 @@ const RegrasCallCenter = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rules.map(rule => (
-                <TableRow key={rule.id}>
+              {sortedRules.map(rule => (
+                <TableRow key={rule.id} className="border-b border-slate-100 hover:bg-muted/30">
                   <TableCell className="font-medium">
                     {rule.type === "Obrigatória" ? (
                       <CheckCircle className="inline mr-2 h-4 w-4 text-primary" />
@@ -187,24 +222,53 @@ const RegrasCallCenter = () => {
                     {rule.description}
                   </TableCell>
                   <TableCell>{rule.category}</TableCell>
-                  <TableCell>{rule.type}</TableCell>
+                  <TableCell>
+                    {rule.type === "Obrigatória" ? (
+                      <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">
+                        Obrigatória
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                        Recomendada
+                      </Badge>
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => startEditRule(rule)}
-                      className="mr-1"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => deleteRule(rule.id)}
-                      className="text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => startEditRule(rule)}
+                            className="mr-1"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Editar Regra</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => deleteRule(rule.id)}
+                            className="text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Eliminar Regra</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </TableCell>
                 </TableRow>
               ))}
@@ -292,8 +356,13 @@ const RegrasCallCenter = () => {
                 id="description"
                 placeholder="Ex: Apresentar nome e empresa no início da chamada"
                 value={newRule.description}
-                onChange={e => setNewRule({...newRule, description: e.target.value})}
+                onChange={e => {
+                  setNewRule({...newRule, description: e.target.value});
+                  if (e.target.value.trim()) setFormError(null);
+                }}
+                className={formError ? "border-destructive" : ""}
               />
+              {formError && <p className="text-destructive text-sm mt-1">{formError}</p>}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -334,9 +403,22 @@ const RegrasCallCenter = () => {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleAddRule} className="ml-auto">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Adicionar Regra
+          <Button 
+            onClick={handleAddRule} 
+            className="ml-auto"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <span className="animate-spin mr-2">⏳</span>
+                Processando...
+              </>
+            ) : (
+              <>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Adicionar Regra
+              </>
+            )}
           </Button>
         </CardFooter>
       </Card>
