@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
-import { FilePdf, Eye } from "lucide-react";
+import { FileText, Eye } from "lucide-react";
 
 const AgenteDetalhe = () => {
   const { id } = useParams();
@@ -102,7 +102,7 @@ const AgenteDetalhe = () => {
           </div>
         </div>
         <Button onClick={generateReport} className="bg-primary hover:bg-primary/90">
-          <FilePdf className="mr-2 h-4 w-4" /> Gerar relatório PDF
+          <FileText className="mr-2 h-4 w-4" /> Gerar relatório PDF
         </Button>
       </div>
 
