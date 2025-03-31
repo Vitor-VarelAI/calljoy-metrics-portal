@@ -10,7 +10,8 @@ import {
   Settings, 
   Sun, 
   Moon, 
-  LogOut 
+  LogOut,
+  ClipboardList 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ const navItems = [
   { name: "Chamadas", path: "/chamadas", icon: Headphones },
   { name: "Agentes", path: "/agentes", icon: Users },
   { name: "Relatórios", path: "/relatorios", icon: FileText },
+  { name: "Regras Call Center", path: "/regras-call-center", icon: ClipboardList },
   { name: "Configurações", path: "/configuracoes", icon: Settings },
 ];
 
