@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Toggle } from "@/components/ui/toggle";
@@ -126,7 +126,7 @@ const Configuracoes = () => {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label className="text-base">Notificações</Label>
-                <FormDescription>Receba alertas sobre eventos importantes</FormDescription>
+                <p className="text-sm text-muted-foreground">Receba alertas sobre eventos importantes</p>
               </div>
               <Switch
                 checked={notificationsEnabled}
@@ -137,7 +137,7 @@ const Configuracoes = () => {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label className="text-base">Tema</Label>
-                <FormDescription>Escolha entre modo claro ou escuro</FormDescription>
+                <p className="text-sm text-muted-foreground">Escolha entre modo claro ou escuro</p>
               </div>
               <Button variant="outline" size="sm" onClick={toggleTheme}>
                 {theme === "dark" ? (
@@ -151,7 +151,7 @@ const Configuracoes = () => {
 
             <div className="space-y-2">
               <Label htmlFor="language" className="text-base">Idioma da Interface</Label>
-              <FormDescription>Selecione o idioma para a interface</FormDescription>
+              <p className="text-sm text-muted-foreground">Selecione o idioma para a interface</p>
               <Select value={language} onValueChange={handleLanguageChange}>
                 <SelectTrigger className="w-full md:w-[240px]">
                   <SelectValue placeholder="Selecione um idioma" />
@@ -195,7 +195,7 @@ const Configuracoes = () => {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label className="text-base">Autenticação de Dois Fatores (2FA)</Label>
-              <FormDescription>Aumente a segurança da sua conta</FormDescription>
+              <p className="text-sm text-muted-foreground">Aumente a segurança da sua conta</p>
             </div>
             <div className="bg-muted px-3 py-1 rounded-md text-xs">Em breve</div>
           </div>
