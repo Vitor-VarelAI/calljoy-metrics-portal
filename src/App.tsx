@@ -11,6 +11,7 @@ import Chamadas from "./pages/Chamadas";
 import ChamadaDetalhes from "./pages/ChamadaDetalhes";
 import Dashboard from "./pages/Dashboard";
 import Agentes from "./pages/Agentes";
+import AgenteDetalhe from "./pages/AgenteDetalhe";
 import Relatorios from "./pages/Relatorios";
 import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
@@ -31,6 +32,7 @@ const App = () => (
               <Route path="chamadas" element={<Chamadas />} />
               <Route path="chamada/:id" element={<ChamadaDetalhes />} />
               <Route path="agentes" element={<Agentes />} />
+              <Route path="agente/:id" element={<AgenteDetalhe />} />
               <Route path="relatorios" element={<Relatorios />} />
               <Route path="configuracoes" element={<Configuracoes />} />
             </Route>
