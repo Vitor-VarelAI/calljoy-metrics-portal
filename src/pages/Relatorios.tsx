@@ -1,29 +1,15 @@
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { CalendarRange, Download, Eye, FileText, Grid2X2, List, Search } from "lucide-react";
+import { FileText } from "lucide-react";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
-import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-
-type Report = {
-  id: string;
-  title: string;
-  date: Date;
-  type: "Individual" | "Resumo por agente" | "Global";
-  status: "Gerado" | "Em processamento";
-  agent?: string;
-};
+import { Report } from "@/components/reports/reportTypes";
+import { ReportStatusBadge } from "@/components/reports/ReportStatusBadge";
+import ReportFilters from "@/components/reports/ReportFilters";
+import ReportListView from "@/components/reports/ReportListView";
+import ReportGridView from "@/components/reports/ReportGridView";
+import ReportHeader from "@/components/reports/ReportHeader";
 
 const Relatorios = () => {
   const { toast } = useToast();
@@ -149,18 +135,7 @@ const Relatorios = () => {
 
   // Renderiza badge de status
   const renderStatusBadge = (status: string) => {
-    if (status === "Gerado") {
-      return (
-        <Badge className="bg-[hsl(160,70%,45%)] hover:bg-[hsl(160,70%,40%)]">
-          ✅ Gerado
-        </Badge>
-      );
-    }
-    return (
-      <Badge variant="secondary" className="bg-[hsl(220,10%,65%)] hover:bg-[hsl(220,10%,60%)]">
-        ⏳ Em processamento
-      </Badge>
-    );
+    return <ReportStatusBadge status={status} />;
   };
 
   return (
@@ -174,274 +149,56 @@ const Relatorios = () => {
         </p>
       </div>
 
-      {/* Filtros */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Filtro de data */}
-            <div className="space-y-2">
-              <Label>📅 Intervalo de Datas</Label>
-              <div className="flex gap-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !startDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarRange className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "dd/MM/yyyy") : "Data inicial"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 pointer-events-auto">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={setStartDate}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="flex gap-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !endDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarRange className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "dd/MM/yyyy") : "Data final"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 pointer-events-auto">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={setEndDate}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-
-            {/* Filtro de agente */}
-            <div className="space-y-2">
-              <Label>👤 Agente</Label>
-              <Select value={selectedAgent} onValueChange={setSelectedAgent}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um agente" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os agentes</SelectItem>
-                  {agents.map((agent) => (
-                    <SelectItem key={agent} value={agent}>
-                      {agent}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Filtro de tipo de relatório */}
-            <div className="space-y-2">
-              <Label>🧾 Tipo de Relatório</Label>
-              <Select value={reportType} onValueChange={setReportType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os tipos</SelectItem>
-                  <SelectItem value="Individual">Chamada individual</SelectItem>
-                  <SelectItem value="Resumo por agente">Resumo por agente</SelectItem>
-                  <SelectItem value="Global">Resumo global</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Busca e botão de ação */}
-            <div className="space-y-2">
-              <Label>🔍 Busca</Label>
-              <div className="flex gap-2">
-                <Input 
-                  placeholder="Buscar por ID ou título" 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Button onClick={handleSearch}>
-                  <Search className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Componente de filtros */}
+      <ReportFilters 
+        startDate={startDate}
+        endDate={endDate}
+        selectedAgent={selectedAgent}
+        reportType={reportType}
+        searchQuery={searchQuery}
+        agents={agents}
+        setStartDate={setStartDate}
+        setEndDate={setEndDate}
+        setSelectedAgent={setSelectedAgent}
+        setReportType={setReportType}
+        setSearchQuery={setSearchQuery}
+        handleSearch={handleSearch}
+      />
 
       {/* Cabeçalho da lista de relatórios */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl font-semibold">Relatórios Disponíveis</h2>
-          <Badge variant="outline">{reports.length}</Badge>
-        </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="sm"
-            className={cn(viewType === "list" && "bg-secondary")} 
-            onClick={() => setViewType("list")}
-          >
-            <List className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            className={cn(viewType === "grid" && "bg-secondary")} 
-            onClick={() => setViewType("grid")}
-          >
-            <Grid2X2 className="h-4 w-4" />
-          </Button>
-          {selectedReports.length > 0 && (
-            <Button onClick={handleExportSelected} size="sm">
-              <Download className="h-4 w-4 mr-2" /> Exportar Selecionados ({selectedReports.length})
-            </Button>
-          )}
-        </div>
-      </div>
+      <ReportHeader 
+        reportCount={reports.length}
+        viewType={viewType}
+        setViewType={setViewType}
+        selectedReports={selectedReports}
+        handleExportSelected={handleExportSelected}
+      />
 
-      {/* Lista de relatórios (visualização de tabela) */}
-      {viewType === "list" && (
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[40px]">
-                    <Checkbox 
-                      checked={selectedReports.length === reports.length}
-                      onCheckedChange={toggleSelectAll}
-                    />
-                  </TableHead>
-                  <TableHead>Título</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {reports.map((report) => (
-                  <TableRow key={report.id}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedReports.includes(report.id)}
-                        onCheckedChange={() => toggleReportSelection(report.id)}
-                      />
-                    </TableCell>
-                    <TableCell className="font-medium">{report.title}</TableCell>
-                    <TableCell>{formatDate(report.date)}</TableCell>
-                    <TableCell>{report.type}</TableCell>
-                    <TableCell>{renderStatusBadge(report.status)}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleViewReport(report.id)}
-                          className="text-[hsl(220,100%,56%)]"
-                          disabled={report.status === "Em processamento"}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleDownloadPDF(report.id)}
-                          disabled={report.status === "Em processamento"}
-                        >
-                          <FileText className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleExportReport(report.id)}
-                          disabled={report.status === "Em processamento"}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Visualização em grade */}
-      {viewType === "grid" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {reports.map((report) => (
-            <Card key={report.id} className="overflow-hidden">
-              <CardHeader className="p-4 pb-2 flex flex-row justify-between items-start">
-                <div>
-                  <CardTitle className="text-base">{report.title}</CardTitle>
-                  <p className="text-sm text-muted-foreground">{formatDate(report.date)}</p>
-                </div>
-                <Checkbox
-                  checked={selectedReports.includes(report.id)}
-                  onCheckedChange={() => toggleReportSelection(report.id)}
-                />
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                <div className="flex justify-between items-center mt-2">
-                  <div className="space-y-2">
-                    <Badge variant="outline">{report.type}</Badge>
-                    <div>{renderStatusBadge(report.status)}</div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleViewReport(report.id)}
-                      className="text-[hsl(220,100%,56%)]"
-                      disabled={report.status === "Em processamento"}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleDownloadPDF(report.id)}
-                      disabled={report.status === "Em processamento"}
-                    >
-                      <FileText className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleExportReport(report.id)}
-                      disabled={report.status === "Em processamento"}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      {/* Visualização em lista ou grade */}
+      {viewType === "list" ? (
+        <ReportListView 
+          reports={reports}
+          selectedReports={selectedReports}
+          toggleReportSelection={toggleReportSelection}
+          toggleSelectAll={toggleSelectAll}
+          handleViewReport={handleViewReport}
+          handleDownloadPDF={handleDownloadPDF}
+          handleExportReport={handleExportReport}
+          formatDate={formatDate}
+          renderStatusBadge={renderStatusBadge}
+        />
+      ) : (
+        <ReportGridView 
+          reports={reports}
+          selectedReports={selectedReports}
+          toggleReportSelection={toggleReportSelection}
+          toggleSelectAll={toggleSelectAll}
+          handleViewReport={handleViewReport}
+          handleDownloadPDF={handleDownloadPDF}
+          handleExportReport={handleExportReport}
+          formatDate={formatDate}
+          renderStatusBadge={renderStatusBadge}
+        />
       )}
     </div>
   );
