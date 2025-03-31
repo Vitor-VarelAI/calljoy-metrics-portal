@@ -31,8 +31,8 @@ const Relatorios = () => {
   // Estados para filtros
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [selectedAgent, setSelectedAgent] = useState<string>("");
-  const [reportType, setReportType] = useState<string>("");
+  const [selectedAgent, setSelectedAgent] = useState<string>("all");
+  const [reportType, setReportType] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   
   // Estado para tipo de visualização
@@ -244,7 +244,7 @@ const Relatorios = () => {
                   <SelectValue placeholder="Selecione um agente" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os agentes</SelectItem>
+                  <SelectItem value="all">Todos os agentes</SelectItem>
                   {agents.map((agent) => (
                     <SelectItem key={agent} value={agent}>
                       {agent}
@@ -262,7 +262,7 @@ const Relatorios = () => {
                   <SelectValue placeholder="Selecione o tipo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os tipos</SelectItem>
+                  <SelectItem value="all">Todos os tipos</SelectItem>
                   <SelectItem value="Individual">Chamada individual</SelectItem>
                   <SelectItem value="Resumo por agente">Resumo por agente</SelectItem>
                   <SelectItem value="Global">Resumo global</SelectItem>
