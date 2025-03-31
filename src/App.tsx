@@ -9,6 +9,7 @@ import MainLayout from "./layouts/MainLayout";
 import Index from "./pages/Index";
 import Chamadas from "./pages/Chamadas";
 import ChamadaDetalhes from "./pages/ChamadaDetalhes";
+import Dashboard from "./pages/Dashboard";
 import Agentes from "./pages/Agentes";
 import Relatorios from "./pages/Relatorios";
 import Configuracoes from "./pages/Configuracoes";
@@ -26,6 +27,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<MainLayout />}>
               <Route index element={<Index />} />
+              <Route path="dashboard" element={<Dashboard />} />
               <Route path="chamadas" element={<Chamadas />} />
               <Route path="chamada/:id" element={<ChamadaDetalhes />} />
               <Route path="agentes" element={<Agentes />} />
