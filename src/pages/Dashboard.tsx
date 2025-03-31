@@ -1,6 +1,5 @@
-
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Phone, Smile, AlertTriangle, Clock, ArrowRight, TrendingUp } from "lucide-react";
 import { 
@@ -20,6 +19,8 @@ import {
   ResponsiveContainer, 
   AreaChart, 
   Area, 
+  LineChart,
+  Line,
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -31,11 +32,11 @@ import { cn } from "@/lib/utils";
 const Dashboard = () => {
   // Dados de exemplo para o gráfico de sentimento
   const sentimentData = [
-    { name: "Seg", valor: 68 },
-    { name: "Ter", valor: 72 },
-    { name: "Qua", valor: 65 },
-    { name: "Qui", valor: 78 },
-    { name: "Sex", valor: 82 },
+    { name: "Seg", valor: 72 },
+    { name: "Ter", valor: 76 },
+    { name: "Qua", valor: 70 },
+    { name: "Qui", valor: 74 },
+    { name: "Sex", valor: 78 },
     { name: "Sáb", valor: 76 },
     { name: "Dom", valor: 74 },
   ];
@@ -228,21 +229,31 @@ const Dashboard = () => {
 
       {/* Gráfico de Tendência de Sentimento */}
       <Card className="overflow-hidden">
-        <CardHeader>
-          <div className="flex items-center">
-            <TrendingUp className="mr-2 h-5 w-5" />
-            <CardTitle>📈 Evolução de Sentimento</CardTitle>
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center">
+                <TrendingUp className="mr-2 h-5 w-5 text-[hsl(160,70%,45%)]" />
+                <CardTitle>📈 Evolução de Sentimento</CardTitle>
+              </div>
+              <CardDescription className="mt-1.5">
+                Análise diária da tendência emocional nas chamadas
+              </CardDescription>
+            </div>
+            <Button variant="outline" size="sm">
+              Ver último mês
+            </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4 pb-6">
           <div className="h-[300px]">
             <ChartContainer
               config={{
                 sentiment: {
                   label: "Sentimento",
                   theme: {
-                    light: "hsl(220, 100%, 56%)",
-                    dark: "hsl(220, 60%, 38%)",
+                    light: "hsl(160, 70%, 45%)",
+                    dark: "hsl(160, 70%, 45%)",
                   },
                 },
               }}
@@ -254,21 +265,34 @@ const Dashboard = () => {
                 >
                   <defs>
                     <linearGradient id="sentimentGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-sentiment)" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="var(--color-sentiment)" stopOpacity={0.1} />
+                      <stop offset="5%" stopColor="hsl(160, 70%, 45%)" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="hsl(160, 70%, 45%)" stopOpacity={0.1} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                   <XAxis dataKey="name" />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip content={<ChartTooltipContent />} />
+                  <YAxis 
+                    domain={[50, 100]} 
+                    tickFormatter={(value) => `${value}%`}
+                  />
+                  <ChartTooltip 
+                    content={
+                      <ChartTooltipContent 
+                        formatter={(value) => `${value}%`}
+                        labelFormatter={(label) => `${label}-feira`}
+                      />
+                    } 
+                  />
                   <Area
                     type="monotone"
                     dataKey="valor"
                     stroke="var(--color-sentiment)"
+                    strokeWidth={2}
                     fillOpacity={1}
                     fill="url(#sentimentGradient)"
                     name="sentiment"
+                    dot={{ r: 4, strokeWidth: 2, fill: "white" }}
+                    activeDot={{ r: 6, strokeWidth: 2, fill: "white" }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
