@@ -1,37 +1,14 @@
+
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Phone, Smile, AlertTriangle, Clock, ArrowRight, TrendingUp } from "lucide-react";
-import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow 
-} from "@/components/ui/table";
-import { 
-  ChartContainer, 
-  ChartTooltip, 
-  ChartTooltipContent 
-} from "@/components/ui/chart";
-import { 
-  ResponsiveContainer, 
-  AreaChart, 
-  Area, 
-  LineChart,
-  Line,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip 
-} from "recharts";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import DashboardKPICards from "@/components/dashboard/DashboardKPICards";
+import SentimentTrendChart from "@/components/dashboard/SentimentTrendChart";
+import RecentCallsTable from "@/components/dashboard/RecentCallsTable";
+import RecentAlertsList from "@/components/dashboard/RecentAlertsList";
+import { SentimentDataPoint, RecentCall, RecentAlert } from "@/components/dashboard/DashboardTypes";
 
 const Dashboard = () => {
   // Dados de exemplo para o gráfico de sentimento
-  const sentimentData = [
+  const sentimentData: SentimentDataPoint[] = [
     { name: "Seg", valor: 72 },
     { name: "Ter", valor: 76 },
     { name: "Qua", valor: 70 },
@@ -42,7 +19,7 @@ const Dashboard = () => {
   ];
 
   // Dados de exemplo para a tabela de chamadas recentes
-  const chamadasRecentes = [
+  const chamadasRecentes: RecentCall[] = [
     { 
       id: "CALL-9582", 
       data: "28/03/2023 14:32", 
@@ -86,7 +63,7 @@ const Dashboard = () => {
   ];
 
   // Dados de exemplo para alertas recentes
-  const alertasRecentes = [
+  const alertasRecentes: RecentAlert[] = [
     { 
       id: 1, 
       timestamp: "28/03/2023 14:25", 
@@ -117,44 +94,6 @@ const Dashboard = () => {
     },
   ];
 
-  // Função para renderizar o badge de sentimento
-  const renderSentimentBadge = (sentimento: string) => {
-    switch (sentimento) {
-      case "positivo":
-        return (
-          <Badge className="bg-[hsl(160,70%,45%)]">
-            <Smile className="mr-1 h-3 w-3" /> Positivo
-          </Badge>
-        );
-      case "negativo":
-        return (
-          <Badge className="bg-[hsl(0,70%,50%)]">
-            <AlertTriangle className="mr-1 h-3 w-3" /> Negativo
-          </Badge>
-        );
-      default:
-        return (
-          <Badge variant="secondary">
-            Neutro
-          </Badge>
-        );
-    }
-  };
-
-  // Função para renderizar o badge de severidade de alerta
-  const renderSeveridadeBadge = (severidade: string) => {
-    switch (severidade) {
-      case "alta":
-        return <Badge className="bg-[hsl(0,70%,50%)]">Alta</Badge>;
-      case "média":
-        return <Badge className="bg-[hsl(30,90%,60%)]">Média</Badge>;
-      case "baixa":
-        return <Badge className="bg-[hsl(220,10%,50%)]">Baixa</Badge>;
-      default:
-        return <Badge variant="secondary">Indefinida</Badge>;
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -165,252 +104,16 @@ const Dashboard = () => {
       </div>
 
       {/* KPIs Principais */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <Card className="overflow-hidden rounded-xl shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Chamadas Hoje</p>
-                <p className="text-4xl font-bold">128</p>
-                <p className="text-xs text-[hsl(160,70%,45%)]">+12 vs ontem</p>
-              </div>
-              <div className="rounded-full bg-primary/10 p-3">
-                <Phone className="h-8 w-8 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="overflow-hidden rounded-xl shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Sentimento Positivo</p>
-                <p className="text-4xl font-bold">74%</p>
-                <p className="text-xs text-muted-foreground">Média últimos 7 dias</p>
-              </div>
-              <div className="rounded-full bg-[hsl(160,70%,45%)]/10 p-3">
-                <Smile className="h-8 w-8 text-[hsl(160,70%,45%)]" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="overflow-hidden rounded-xl shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Alertas Críticos</p>
-                <p className="text-4xl font-bold">16</p>
-                <p className="text-xs text-muted-foreground">Chamadas com incidentes</p>
-              </div>
-              <div className="rounded-full bg-[hsl(0,70%,50%)]/10 p-3">
-                <AlertTriangle className="h-8 w-8 text-[hsl(0,70%,50%)]" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="overflow-hidden rounded-xl shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Duração Média</p>
-                <p className="text-4xl font-bold">06:21</p>
-                <p className="text-xs text-muted-foreground">Últimos 7 dias</p>
-              </div>
-              <div className="rounded-full bg-primary/10 p-3">
-                <Clock className="h-8 w-8 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <DashboardKPICards />
 
       {/* Gráfico de Tendência de Sentimento */}
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center">
-                <TrendingUp className="mr-2 h-5 w-5 text-[hsl(160,70%,45%)]" />
-                <CardTitle>📈 Evolução de Sentimento</CardTitle>
-              </div>
-              <CardDescription className="mt-1.5">
-                Análise diária da tendência emocional nas chamadas
-              </CardDescription>
-            </div>
-            <Button variant="outline" size="sm">
-              Ver último mês
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-4 pb-6">
-          <div className="h-[300px]">
-            <ChartContainer
-              config={{
-                sentiment: {
-                  label: "Sentimento",
-                  theme: {
-                    light: "hsl(160, 70%, 45%)",
-                    dark: "hsl(160, 70%, 45%)",
-                  },
-                },
-              }}
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={sentimentData}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                >
-                  <defs>
-                    <linearGradient id="sentimentGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(160, 70%, 45%)" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="hsl(160, 70%, 45%)" stopOpacity={0.1} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                  <XAxis dataKey="name" />
-                  <YAxis 
-                    domain={[50, 100]} 
-                    tickFormatter={(value) => `${value}%`}
-                  />
-                  <ChartTooltip 
-                    content={
-                      <ChartTooltipContent 
-                        formatter={(value) => `${value}%`}
-                        labelFormatter={(label) => `${label}-feira`}
-                      />
-                    } 
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="valor"
-                    stroke="var(--color-sentiment)"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#sentimentGradient)"
-                    name="sentiment"
-                    dot={{ r: 4, strokeWidth: 2, fill: "white" }}
-                    activeDot={{ r: 6, strokeWidth: 2, fill: "white" }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </div>
-        </CardContent>
-      </Card>
+      <SentimentTrendChart sentimentData={sentimentData} />
 
       {/* Tabela de Chamadas Recentes */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <CardTitle>📋 Chamadas Recentes</CardTitle>
-            </div>
-            <Button variant="outline" size="sm">
-              Ver todas <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Agente</TableHead>
-                  <TableHead>Duração</TableHead>
-                  <TableHead>Sentimento</TableHead>
-                  <TableHead>Script</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {chamadasRecentes.map((chamada) => (
-                  <TableRow 
-                    key={chamada.id} 
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => window.location.href = `/chamada/${chamada.id}`}
-                  >
-                    <TableCell>{chamada.data}</TableCell>
-                    <TableCell>{chamada.agente}</TableCell>
-                    <TableCell>{chamada.duracao}</TableCell>
-                    <TableCell>{renderSentimentBadge(chamada.sentimento)}</TableCell>
-                    <TableCell>
-                      {chamada.script ? (
-                        <Badge variant="secondary" className="bg-[hsl(160,70%,45%)]/20 text-[hsl(160,70%,45%)]">
-                          ✅ Completo
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="bg-[hsl(0,70%,50%)]/20 text-[hsl(0,70%,50%)]">
-                          ❌ Incompleto
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.href = `/chamada/${chamada.id}`;
-                        }}
-                      >
-                        Detalhes
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+      <RecentCallsTable calls={chamadasRecentes} />
 
       {/* Seção de Alertas */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <CardTitle>❗ Alertas Recentes</CardTitle>
-            </div>
-            <Button variant="outline" size="sm">
-              Ver todos <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {alertasRecentes.map((alerta) => (
-              <Card key={alerta.id} className="overflow-hidden">
-                <div className={cn(
-                  "h-1 w-full",
-                  alerta.severidade === "alta" ? "bg-[hsl(0,70%,50%)]" : 
-                  alerta.severidade === "média" ? "bg-[hsl(30,90%,60%)]" : 
-                  "bg-[hsl(220,10%,50%)]"
-                )} />
-                <CardContent className="p-4">
-                  <div className="flex flex-col space-y-1 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-                    <div>
-                      <p className="font-medium">{alerta.tipo}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {alerta.agente} • {alerta.timestamp}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {renderSeveridadeBadge(alerta.severidade)}
-                      <Button variant="ghost" size="sm">
-                        Ver chamada
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <RecentAlertsList alerts={alertasRecentes} />
     </div>
   );
 };
