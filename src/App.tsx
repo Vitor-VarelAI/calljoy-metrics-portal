@@ -14,6 +14,7 @@ import Agentes from "./pages/Agentes";
 import AgenteDetalhe from "./pages/AgenteDetalhe";
 import Relatorios from "./pages/Relatorios";
 import Configuracoes from "./pages/Configuracoes";
+import RegrasCallCenter from "./pages/RegrasCallCenter";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="agente/:id" element={<AgenteDetalhe />} />
               <Route path="relatorios" element={<Relatorios />} />
               <Route path="configuracoes" element={<Configuracoes />} />
+              <Route path="regras-call-center" element={<RegrasCallCenter />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
