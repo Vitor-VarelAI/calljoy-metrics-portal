@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { 
   Table, 
@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Dados fictícios de chamadas para a tabela
 const callsData = [
@@ -146,10 +147,58 @@ const Chamadas = () => {
   const [selectedAgent, setSelectedAgent] = useState("Todos os agentes");
   const [sentiment, setSentiment] = useState("Todos");
   const [onlyWithAlerts, setOnlyWithAlerts] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   
   // Estado para paginação
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(callsData.length / 5);
+  
+  // Filtragem de dados com base nos filtros aplicados
+  const filteredCalls = useMemo(() => {
+    return callsData.filter((call) => {
+      // Filtro de busca (nome do agente ou ID)
+      if (searchQuery && !call.agent.toLowerCase().includes(searchQuery.toLowerCase()) && 
+          !call.id.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+      
+      // Filtro de agente
+      if (selectedAgent !== "Todos os agentes" && call.agent !== selectedAgent) {
+        return false;
+      }
+      
+      // Filtro de sentimento
+      if (sentiment !== "Todos") {
+        const sentimentLower = sentiment.toLowerCase();
+        if (call.sentiment !== sentimentLower) {
+          return false;
+        }
+      }
+      
+      // Filtro de alertas
+      if (onlyWithAlerts && call.alerts === 0) {
+        return false;
+      }
+      
+      // Filtros de data poderiam ser implementados aqui...
+      
+      return true;
+    });
+  }, [searchQuery, selectedAgent, sentiment, onlyWithAlerts]);
+  
+  // Cálculo de paginação
+  const totalPages = Math.ceil(filteredCalls.length / 5);
+  const paginatedCalls = filteredCalls.slice((currentPage - 1) * 5, currentPage * 5);
+  
+  // Função para limpar todos os filtros
+  const clearFilters = () => {
+    setDateFrom(undefined);
+    setDateTo(undefined);
+    setSelectedAgent("Todos os agentes");
+    setSentiment("Todos");
+    setOnlyWithAlerts(false);
+    setSearchQuery("");
+    setCurrentPage(1);
+  };
   
   return (
     <div className="space-y-6">
@@ -253,8 +302,23 @@ const Chamadas = () => {
               </Select>
             </div>
             
-            {/* Switch para Alertas */}
+            {/* Campo de busca */}
             <div className="space-y-2">
+              <Label htmlFor="search">🔍 Busca</Label>
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="search"
+                  placeholder="Pesquisar agente ou ID"
+                  className="pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            {/* Switch para Alertas */}
+            <div className="space-y-2 flex flex-col">
               <Label htmlFor="alertas">🚨 Alertas</Label>
               <div className="flex items-center space-x-2">
                 <Switch
@@ -266,14 +330,21 @@ const Chamadas = () => {
                   Só com alertas
                 </Label>
               </div>
-            </div>
-            
-            {/* Botão de Busca */}
-            <div className="space-y-2 flex items-end">
-              <Button className="w-full">
-                <Search className="mr-2 h-4 w-4" />
-                Buscar
-              </Button>
+              
+              {/* Botões de ação */}
+              <div className="flex space-x-2 mt-auto">
+                <Button className="w-full" onClick={() => setCurrentPage(1)}>
+                  <Search className="mr-2 h-4 w-4" />
+                  Buscar
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-shrink-0"
+                  onClick={clearFilters}
+                >
+                  Limpar
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -289,6 +360,9 @@ const Chamadas = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>
+                    <Checkbox />
+                  </TableHead>
                   <TableHead>Data</TableHead>
                   <TableHead>Agente</TableHead>
                   <TableHead>Duração</TableHead>
@@ -299,28 +373,45 @@ const Chamadas = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {callsData.map((call) => (
+                {paginatedCalls.map((call) => (
                   <TableRow 
                     key={call.id}
                     className="hover:bg-muted/50 cursor-pointer"
                   >
+                    <TableCell>
+                      <Checkbox />
+                    </TableCell>
                     <TableCell>{call.date}</TableCell>
                     <TableCell>{call.agent}</TableCell>
                     <TableCell>{call.duration}</TableCell>
                     <TableCell>{getSentimentBadge(call.sentiment)}</TableCell>
                     <TableCell>
-                      {call.script ? (
-                        <CheckCircle className="h-5 w-5 text-[hsl(160,70%,45%)]" />
-                      ) : (
-                        <XCircle className="h-5 w-5 text-[hsl(0,70%,50%)]" />
-                      )}
+                      <Tooltip>
+                        <TooltipTrigger>
+                          {call.script ? (
+                            <CheckCircle className="h-5 w-5 text-[hsl(160,70%,45%)]" />
+                          ) : (
+                            <XCircle className="h-5 w-5 text-[hsl(0,70%,50%)]" />
+                          )}
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {call.script ? "Script seguido corretamente" : "Script incompleto"}
+                        </TooltipContent>
+                      </Tooltip>
                     </TableCell>
                     <TableCell>
                       {call.alerts > 0 ? (
-                        <div className="flex items-center">
-                          <AlertTriangle className="h-5 w-5 text-[hsl(0,70%,50%)]" />
-                          <span className="ml-1">{call.alerts}</span>
-                        </div>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div className="flex items-center">
+                              <AlertTriangle className="h-5 w-5 text-[hsl(0,70%,50%)]" />
+                              <span className="ml-1">{call.alerts}</span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {call.alerts} {call.alerts === 1 ? "alerta detectado" : "alertas detectados"}
+                          </TooltipContent>
+                        </Tooltip>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
@@ -334,6 +425,14 @@ const Chamadas = () => {
                     </TableCell>
                   </TableRow>
                 ))}
+                
+                {paginatedCalls.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-24 text-center">
+                      Nenhuma chamada encontrada com os filtros aplicados.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
@@ -353,7 +452,7 @@ const Chamadas = () => {
                 </PaginationItem>
                 <PaginationItem>
                   <span className="flex h-10 items-center px-4">
-                    Página {currentPage} de {totalPages}
+                    Página {currentPage} de {totalPages || 1}
                   </span>
                 </PaginationItem>
                 <PaginationItem>
