@@ -1,0 +1,39 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Call {
+  id              String    @id @default(cuid())
+  agentId         String
+  audioUrl        String
+  audioFileName   String
+  mimeType        String
+  transcript      String?
+  duration        Int
+  timestamp       DateTime  @default(now())
+  processingStatus String
+  processingError String?
+  summary         String?
+  sentiment       Json
+  scriptCompliance Json
+  alerts          Json[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([agentId])
+}
+
+model Agent {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
