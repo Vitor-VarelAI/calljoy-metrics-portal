@@ -1,26 +1,15 @@
 
 import React from "react";
 import { useParams } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { 
-  FileText, 
-  FileUp, 
-  Flag, 
-  Play, 
-  Pause, 
-  Rewind, 
-  FastForward 
-} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { FileText, FileUp, Flag } from "lucide-react";
+import AudioPlayer from "@/components/audio/AudioPlayer";
 
 const ChamadaDetalhes = () => {
   const { id } = useParams<{ id: string }>();
-  const [isPlaying, setIsPlaying] = React.useState(false);
-
-  const togglePlayback = () => {
-    setIsPlaying(!isPlaying);
-  };
 
   return (
     <div className="space-y-6">
@@ -50,12 +39,7 @@ const ChamadaDetalhes = () => {
                   { type: 'violation', timestamp: 145, description: 'Script compliance violation' },
                   { type: 'positive', timestamp: 192, description: 'Excellent customer service' },
                 ]}
-              />e="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="text-center text-muted-foreground text-sm">
-                02:17 / 06:32
-              </div>
+              />
             </div>
           </CardContent>
         </Card>
