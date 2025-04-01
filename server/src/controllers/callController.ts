@@ -27,21 +27,35 @@ const upload = multer({
   }
 });
 
-let calls: Call[] = [];
+import prisma from '../utils/database';
 
 // Get all calls with pagination and filters
-export const getCalls = (req: Request, res: Response) => {
-  // TODO: Implement filters from query params
-  res.json(calls);
+export const getCalls = async (req: Request, res: Response) => {
+  try {
+    const calls = await prisma.call.findMany({
+      orderBy: { timestamp: 'desc' }
+    });
+    res.json(calls);
+  } catch (error) {
+    logError(error);
+    res.status(500).json({ error: 'Failed to fetch calls' });
+  }
 };
 
 // Get single call details
-export const getCallById = (req: Request, res: Response) => {
-  const call = calls.find(c => c.id === req.params.id);
-  if (!call) {
-    return res.status(404).json({ message: "Call not found" });
+export const getCallById = async (req: Request, res: Response) => {
+  try {
+    const call = await prisma.call.findUnique({
+      where: { id: req.params.id }
+    });
+    if (!call) {
+      return res.status(404).json({ message: "Call not found" });
+    }
+    res.json(call);
+  } catch (error) {
+    logError(error);
+    res.status(500).json({ error: 'Failed to fetch call details' });
   }
-  res.json(call);
 };
 
 // Endpoint to register a new call for analysis
@@ -61,29 +75,20 @@ export const uploadCall = (req: Request, res: Response) => {
 
     const { agentId } = req.body;
     
-    const newCall: Call = {
-      id: Date.now().toString(),
-      agentId,
-      audioUrl: `/uploads/${req.file.filename}`,
-      audioFileName: req.file.originalname,
-      mimeType: req.file.mimetype,
-      transcript: '',
-      duration: 0,
-      timestamp: new Date(),
-      summary: '',
-      sentiment: {
-        overall: 'neutral',
-        scores: { positive: 0, neutral: 0, negative: 0 }
-      },
-      scriptCompliance: {
-        items: [],
-        score: 0
-      },
-      alerts: [],
-      processingStatus: 'pending'
-    };
-
-    calls.push(newCall);
+    const newCall = await prisma.call.create({
+      data: {
+        agentId,
+        audioUrl: `/uploads/${req.file.filename}`,
+        audioFileName: req.file.originalname,
+        mimeType: req.file.mimetype,
+        transcript: '',
+        duration: 0,
+        processingStatus: 'pending',
+        sentiment: { overall: 'neutral', scores: { positive: 0, neutral: 0, negative: 0 } },
+        scriptCompliance: { items: [], score: 0 },
+        alerts: []
+      }
+    });
     
     // Start async processing pipeline
     processCall(newCall).catch(error => {
