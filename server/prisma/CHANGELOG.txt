@@ -1,0 +1,17 @@
+# Changelog
+
+## [Unreleased]
+
+### 📝 Logging Implementation
+
+- Created a logging utility in `server/src/utils/logger.ts` to log messages and errors to a file.
+- Implemented consistent log formatting with timestamps.
+- Added logging to `server/src/controllers/callController.ts` for events such as call uploads and error handling.
+- Implemented global logging in `server/src/index.ts` to capture unhandled exceptions and server startup events.
+
+### 🗄️ Database Setup
+
+- Installed required packages: `pg`, `@types/pg`, `prisma`, `@prisma/client`.
+- Created a Prisma schema in `server/prisma/schema.prisma` defining the `Call` and `Agent` models.
+- Added `server/src/utils/database.ts` to handle database interactions using Prisma.
+- Included query performance logging within the database utility.
