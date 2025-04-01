@@ -22,6 +22,7 @@ interface SidebarProps {
 const navItems = [
   { name: "Dashboard", path: "/", icon: BarChart },
   { name: "Chamadas", path: "/chamadas", icon: Headphones },
+  { name: "Upload", path: "/upload", icon: FileUp },
   { name: "Agentes", path: "/agentes", icon: Users },
   { name: "Relatórios", path: "/relatorios", icon: FileText },
   { name: "Regras Call Center", path: "/regras-call-center", icon: ClipboardList },
