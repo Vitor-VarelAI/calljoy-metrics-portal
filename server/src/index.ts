@@ -1,3 +1,4 @@
+
 import express from 'express';
 import cors from 'cors';
 import agentRoutes from './routes/agents';
@@ -7,16 +8,13 @@ import callRoutes from './routes/calls';
 const app = express();
 const port = 5000;
 
-app.use(cors({
-  origin: ['http://localhost:8081', 'http://0.0.0.0:8081'],
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/calls', callRoutes);
-app.use('/agents', agentRoutes);
-app.use('/rules', ruleRoutes);
+app.use('/api/agents', agentRoutes);
+app.use('/api/rules', ruleRoutes);
+app.use('/api/calls', callRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -24,5 +22,5 @@ app.get('/api/health', (req, res) => {
 });
 
 app.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on http://0.0.0.0:${port}`);
+  console.log(`Server running on port ${port}`);
 });
