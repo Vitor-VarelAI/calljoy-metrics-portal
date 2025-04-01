@@ -45,11 +45,15 @@ export const getCallById = (req: Request, res: Response) => {
 };
 
 // Endpoint to register a new call for analysis
+import { logToFile, logError } from '../utils/logger';
+
 export const uploadCall = (req: Request, res: Response) => {
   upload.single('audio')(req, res, (err) => {
     if (err) {
+      logError(`Upload failed: ${err.message}`);
       return res.status(400).json({ error: err.message });
     }
+    logToFile(`New call upload started with agent ID: ${req.body.agentId}`);
     
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });

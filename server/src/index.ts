@@ -23,6 +23,19 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+import { logToFile, logError } from './utils/logger';
+
+// Global error handler
+app.use((err: Error, req: Request, res: Response, next: Function) => {
+  logError(err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 app.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on port ${port}`);
+  logToFile(`Server started on port ${port}`);
+});
+
+process.on('uncaughtException', (err) => {
+  logError(`Uncaught Exception: ${err}`);
+  process.exit(1);
 });
