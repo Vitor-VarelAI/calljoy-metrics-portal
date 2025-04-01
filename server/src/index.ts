@@ -7,13 +7,16 @@ import callRoutes from './routes/calls';
 const app = express();
 const port = 5000;
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:8081', 'http://0.0.0.0:8081'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
-app.use('/api/agents', agentRoutes);
-app.use('/api/rules', ruleRoutes);
-app.use('/api/calls', callRoutes);
+app.use('/calls', callRoutes);
+app.use('/agents', agentRoutes);
+app.use('/rules', ruleRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
