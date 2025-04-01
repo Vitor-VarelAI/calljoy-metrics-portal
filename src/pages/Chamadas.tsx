@@ -140,7 +140,37 @@ const getSentimentBadge = (sentiment: string) => {
   }
 };
 
+import { FileUpload } from '../components/upload/FileUpload';
+import { toast } from '../components/ui/use-toast';
+
 const Chamadas = () => {
+  const handleUpload = async (files: File[]) => {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('audio', file);
+    });
+
+    try {
+      const response = await fetch('/api/calls/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) throw new Error('Erro ao fazer upload');
+      
+      const result = await response.json();
+      toast({
+        title: 'Upload concluído',
+        description: `${files.length} ficheiros enviados com sucesso`
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Não foi possível fazer upload dos ficheiros'
+      });
+    }
+  };
   // Estados para os filtros
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
