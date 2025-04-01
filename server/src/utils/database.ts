@@ -1,15 +1,21 @@
 
 import { PrismaClient } from '@prisma/client';
-import { logError } from './logger';
+import { logToFile, logError } from './logger';
 
 const prisma = new PrismaClient();
 
+// Add query performance logging
 prisma.$use(async (params, next) => {
-  const before = Date.now();
-  const result = await next(params);
-  const after = Date.now();
-  logToFile(`Query ${params.model}.${params.action} took ${after - before}ms`);
-  return result;
+  const startTime = Date.now();
+  try {
+    const result = await next(params);
+    const duration = Date.now() - startTime;
+    logToFile(`Query ${params.model}.${params.action} took ${duration}ms`);
+    return result;
+  } catch (error) {
+    logError(error);
+    throw error;
+  }
 });
 
 export default prisma;

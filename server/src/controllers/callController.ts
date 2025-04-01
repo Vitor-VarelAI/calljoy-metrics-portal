@@ -28,6 +28,7 @@ const upload = multer({
 });
 
 import prisma from '../utils/database';
+import { logToFile, logError } from '../utils/logger';
 
 // Get all calls with pagination and filters
 export const getCalls = async (req: Request, res: Response) => {

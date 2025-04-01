@@ -1,4 +1,14 @@
 import express from 'express';
+import { logToFile, logError } from './utils/logger';
+
+process.on('uncaughtException', (error) => {
+  logError(error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  logError(reason);
+});
 import cors from 'cors';
 import agentRoutes from './routes/agents';
 import ruleRoutes from './routes/rules';
