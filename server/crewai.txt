@@ -1,0 +1,48 @@
+# 🤖 CrewAI Integration – CallScan
+
+This document outlines the architecture and implementation plan for integrating CrewAI into CallScan to handle modular AI-based call analysis.
+
+---
+
+## 🎯 Why CrewAI?
+
+CrewAI allows us to create **autonomous agents**, each with a specific role in analyzing a call transcript. This architecture offers:
+
+- Clear separation of responsibilities
+- Better debugging and traceability
+- Scalable logic (easy to add/remove agents)
+- Dynamic model selection per agent
+- Future-proofing for advanced analysis needs
+
+---
+
+## 🧩 Crew Structure
+
+### 🟦 Inputs:
+- `transcript`: Full call transcription (from Whisper)
+- `custom_rules`: Script compliance rules provided per call center
+- `priority`: Optional flag to select more advanced models if needed
+
+---
+
+## 🧠 Agents & Their Tasks
+
+| Agent               | Task Description                                                                 |
+|---------------------|----------------------------------------------------------------------------------|
+| **Compliance Reviewer** | Check whether the agent followed the client's compliance rules (`{custom_rules}`) |
+| **Sentiment Analyzer**  | Analyze emotional tone and sentiment shifts throughout the conversation       |
+| **Risk Detector**       | Identify critical, aggressive, or risky language usage                        |
+| **Summary Generator**   | Create a short, natural-language summary of the full conversation             |
+| **Improvement Advisor** | Suggest how the agent could improve, using outputs from the other agents       |
+
+The `Improvement Advisor` agent takes inputs from the previous three agents to generate contextual, actionable suggestions.
+
+---
+
+## ⚙️ Model Flexibility
+
+Each agent can run on a different model based on task complexity and business priority:
+
+- GPT-3.5-turbo → For lightweight tasks (compliance, sentiment, risk)
+- GPT-4 or GPT-4-turbo → For nuanced tasks (summary, suggestions)
+- Open architecture supports plug-and-play LLM switching
