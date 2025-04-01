@@ -1,69 +1,84 @@
-# Welcome to your Lovable project
+# 📞 CallScan
 
-## Project info
+**AI-powered call analysis platform** for modern call centers.  
+Transcribes, analyzes, and summarizes customer calls — with focus on regulatory compliance, critical language detection, and actionable agent feedback.
 
-**URL**: https://lovable.dev/projects/567260a5-0e4c-44b9-85af-4ca246908b9e
+---
 
-## How can I edit this code?
+## 🚀 What is CallScan?
 
-There are several ways of editing your application.
+CallScan enables supervisors to:
 
-**Use Lovable**
+- 🧠 Transcribe calls locally using Whisper
+- 🤖 Analyze content using GPT (OpenAI)
+- 📋 Check agent compliance against custom rules
+- 😃 Track sentiment shifts during the call
+- ❗ Detect critical words or phrases
+- 🔊 Use a smart player to jump directly to alert moments
+- 📄 Export HTML & PDF reports for audits or reviews
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/567260a5-0e4c-44b9-85af-4ca246908b9e) and start prompting.
+Built to be **privacy-first**, 100% hosted in the EU.
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🧰 Tech Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+| Layer        | Technology               |
+|--------------|---------------------------|
+| Backend      | Python + FastAPI          |
+| Transcription| faster-whisper (local Whisper) |
+| AI Analysis  | OpenAI GPT-3.5-turbo      |
+| Storage      | Local SSD or Hetzner      |
+| Reports      | HTML + PDF generator      |
+| Frontend     | (Custom, decoupled — not in this repo)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## ⚙️ Core Features
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- 📤 Upload audio (`.mp3`, `.wav`) and metadata (`.xlsx`)
+- 📋 Configure per-call-center rules (script compliance)
+- 🔊 Audio player with visual alert markers
+- 😐 Sentiment classification (per call + over time)
+- 💬 Natural language summaries
+- 🧠 Agent improvement suggestions
+- 📁 Report export (PDF/HTML)
+- 🧾 Multi-agent & multi-call-center support
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🧪 Running Locally
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+### Requirements
 
-**Edit a file directly in GitHub**
+- Python 3.10+
+- ffmpeg installed (for Whisper)
+- OpenAI API key (set as env var)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
 
-**Use GitHub Codespaces**
+🔐 Privacy & Compliance
+✅ All processing and storage is done on EU servers (Hetzner)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+❌ No audio or data is shared with third parties
 
-## What technologies are used for this project?
+✅ Only transcripts are sent to OpenAI
 
-This project is built with .
+🛡️ Custom rules are scoped per call center (tenant-safe)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+🔄 Roadmap (backend-focused)
+ Upload endpoint
 
-## How can I deploy this project?
+ Whisper transcription pipeline
 
-Simply open [Lovable](https://lovable.dev/projects/567260a5-0e4c-44b9-85af-4ca246908b9e) and click on Share -> Publish.
+ GPT-3.5 analysis with injected rules
 
-## I want to use a custom domain - is that possible?
+ Rule management API
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+ HTML + PDF report generation
+
+ Time-aligned alert export for audio player
+
+ Agent-level metrics endpoint
+
+ Call indexing & search
+
