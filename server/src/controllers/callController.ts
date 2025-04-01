@@ -1,6 +1,31 @@
 
 import { Request, Response } from 'express';
+import multer from 'multer';
+import path from 'path';
 import { Call } from '../types';
+
+const storage = multer.diskStorage({
+  destination: './uploads/',
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage,
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = ['audio/mpeg', 'audio/wav', 'audio/wave'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only MP3 and WAV files are allowed.'));
+    }
+  },
+  limits: {
+    fileSize: 50 * 1024 * 1024 // 50MB limit
+  }
+});
 
 let calls: Call[] = [];
 
@@ -20,8 +45,45 @@ export const getCallById = (req: Request, res: Response) => {
 };
 
 // Endpoint to register a new call for analysis
-export const registerCall = (req: Request, res: Response) => {
-  const { agentId, audioUrl } = req.body;
+export const uploadCall = (req: Request, res: Response) => {
+  upload.single('audio')(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const { agentId } = req.body;
+    
+    const newCall: Call = {
+      id: Date.now().toString(),
+      agentId,
+      audioUrl: `/uploads/${req.file.filename}`,
+      audioFileName: req.file.originalname,
+      mimeType: req.file.mimetype,
+      transcript: '',
+      duration: 0,
+      timestamp: new Date(),
+      summary: '',
+      sentiment: {
+        overall: 'neutral',
+        scores: { positive: 0, neutral: 0, negative: 0 }
+      },
+      scriptCompliance: {
+        items: [],
+        score: 0
+      },
+      alerts: [],
+      processingStatus: 'pending'
+    };
+
+    calls.push(newCall);
+    // TODO: Trigger async analysis pipeline
+    res.status(201).json(newCall);
+  });
+};
   
   const newCall: Call = {
     id: Date.now().toString(),

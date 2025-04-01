@@ -10,9 +10,13 @@ export interface Call {
   id: string;
   agentId: string;
   audioUrl: string;
+  audioFileName: string;
+  mimeType: string;
   transcript: string;
   duration: number;
   timestamp: Date;
+  processingStatus: 'pending' | 'transcribing' | 'analyzing' | 'completed' | 'error';
+  processingError?: string;
   summary: string;
   sentiment: {
     overall: 'positive' | 'neutral' | 'negative';
