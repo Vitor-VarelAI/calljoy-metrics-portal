@@ -103,8 +103,11 @@ async function processCall(call: Call) {
     // Update status to analyzing
     call.processingStatus = 'analyzing';
     
-    // Analyze using GPT-3.5
-    const analysis = await analyzeTranscript(transcription);
+    // Get client rules
+    const rules = await getRulesForClient(call.clientId);
+    
+    // Analyze using CrewAI
+    const analysis = await analyzeCall(transcription, rules);
     
     // Update call with analysis results
     Object.assign(call, {
