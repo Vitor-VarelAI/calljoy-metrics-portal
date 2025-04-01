@@ -16,6 +16,7 @@ import Relatorios from "./pages/Relatorios";
 import Configuracoes from "./pages/Configuracoes";
 import RegrasCallCenter from "./pages/RegrasCallCenter";
 import NotFound from "./pages/NotFound";
+import Upload from "./pages/Upload";
 
 const queryClient = new QueryClient();
 

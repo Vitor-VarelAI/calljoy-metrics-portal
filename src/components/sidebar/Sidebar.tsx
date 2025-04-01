@@ -1,4 +1,3 @@
-
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { useTheme } from "../../hooks/useTheme";
@@ -11,7 +10,8 @@ import {
   Sun, 
   Moon, 
   LogOut,
-  ClipboardList 
+  ClipboardList,
+  FileUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
