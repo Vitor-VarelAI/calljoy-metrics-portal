@@ -80,8 +80,46 @@ export const uploadCall = (req: Request, res: Response) => {
     };
 
     calls.push(newCall);
-    // TODO: Trigger async analysis pipeline
+    
+    // Start async processing pipeline
+    processCall(newCall).catch(error => {
+      console.error(`Error processing call ${newCall.id}:`, error);
+      newCall.processingStatus = 'error';
+      newCall.processingError = error.message;
+    });
+    
     res.status(201).json(newCall);
+});
+
+async function processCall(call: Call) {
+  try {
+    // Update status to transcribing
+    call.processingStatus = 'transcribing';
+    
+    // Transcribe using Whisper
+    const transcription = await transcribeAudio(call.audioUrl);
+    call.transcript = transcription;
+    
+    // Update status to analyzing
+    call.processingStatus = 'analyzing';
+    
+    // Analyze using GPT-3.5
+    const analysis = await analyzeTranscript(transcription);
+    
+    // Update call with analysis results
+    Object.assign(call, {
+      summary: analysis.summary,
+      sentiment: analysis.sentiment,
+      scriptCompliance: analysis.scriptCompliance,
+      alerts: analysis.alerts,
+      processingStatus: 'completed'
+    });
+    
+  } catch (error) {
+    call.processingStatus = 'error';
+    call.processingError = error.message;
+    throw error;
+  }
   });
 };
   
