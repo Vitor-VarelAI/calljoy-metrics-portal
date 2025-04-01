@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import agentRoutes from './routes/agents';
@@ -8,7 +7,10 @@ import callRoutes from './routes/calls';
 const app = express();
 const port = 5000;
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:8080', 'http://0.0.0.0:8080'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes

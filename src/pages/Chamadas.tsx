@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -148,10 +147,10 @@ const Chamadas = () => {
   const [sentiment, setSentiment] = useState("Todos");
   const [onlyWithAlerts, setOnlyWithAlerts] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   // Estado para paginação
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   // Filtragem de dados com base nos filtros aplicados
   const filteredCalls = useMemo(() => {
     return callsData.filter((call) => {
@@ -160,12 +159,12 @@ const Chamadas = () => {
           !call.id.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
       }
-      
+
       // Filtro de agente
       if (selectedAgent !== "Todos os agentes" && call.agent !== selectedAgent) {
         return false;
       }
-      
+
       // Filtro de sentimento
       if (sentiment !== "Todos") {
         const sentimentLower = sentiment.toLowerCase();
@@ -173,22 +172,22 @@ const Chamadas = () => {
           return false;
         }
       }
-      
+
       // Filtro de alertas
       if (onlyWithAlerts && call.alerts === 0) {
         return false;
       }
-      
+
       // Filtros de data poderiam ser implementados aqui...
-      
+
       return true;
     });
   }, [searchQuery, selectedAgent, sentiment, onlyWithAlerts]);
-  
+
   // Cálculo de paginação
   const totalPages = Math.ceil(filteredCalls.length / 5);
   const paginatedCalls = filteredCalls.slice((currentPage - 1) * 5, currentPage * 5);
-  
+
   // Função para limpar todos os filtros
   const clearFilters = () => {
     setDateFrom(undefined);
@@ -199,7 +198,7 @@ const Chamadas = () => {
     setSearchQuery("");
     setCurrentPage(1);
   };
-  
+
   return (
     <div className="space-y-6">
       <div>
@@ -208,7 +207,7 @@ const Chamadas = () => {
         </h1>
         <p className="text-muted-foreground">Lista completa de chamadas analisadas com IA</p>
       </div>
-      
+
       {/* Filtros */}
       <Card>
         <CardContent className="pt-6">
@@ -239,7 +238,7 @@ const Chamadas = () => {
                     />
                   </PopoverContent>
                 </Popover>
-                
+
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -264,7 +263,7 @@ const Chamadas = () => {
                 </Popover>
               </div>
             </div>
-            
+
             {/* Filtro de Agente */}
             <div className="space-y-2">
               <Label htmlFor="agente">🧑‍💼 Agente</Label>
@@ -282,7 +281,7 @@ const Chamadas = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             {/* Filtro de Sentimento */}
             <div className="space-y-2">
               <Label htmlFor="sentimento">🙂 Sentimento</Label>
@@ -301,7 +300,7 @@ const Chamadas = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             {/* Campo de busca */}
             <div className="space-y-2">
               <Label htmlFor="search">🔍 Busca</Label>
@@ -316,7 +315,7 @@ const Chamadas = () => {
                 />
               </div>
             </div>
-            
+
             {/* Switch para Alertas */}
             <div className="space-y-2 flex flex-col">
               <Label htmlFor="alertas">🚨 Alertas</Label>
@@ -330,7 +329,7 @@ const Chamadas = () => {
                   Só com alertas
                 </Label>
               </div>
-              
+
               {/* Botões de ação */}
               <div className="flex space-x-2 mt-auto">
                 <Button className="w-full" onClick={() => setCurrentPage(1)}>
@@ -349,7 +348,7 @@ const Chamadas = () => {
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Tabela de Chamadas */}
       <Card>
         <CardHeader>
@@ -425,7 +424,7 @@ const Chamadas = () => {
                     </TableCell>
                   </TableRow>
                 ))}
-                
+
                 {paginatedCalls.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={8} className="h-24 text-center">
@@ -436,7 +435,7 @@ const Chamadas = () => {
               </TableBody>
             </Table>
           </div>
-          
+
           {/* Paginação */}
           <div className="mt-4 flex justify-center">
             <Pagination>
