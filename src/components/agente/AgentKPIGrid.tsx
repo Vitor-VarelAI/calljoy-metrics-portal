@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -20,7 +19,9 @@ const AgentKPIGrid: React.FC<AgentKPIGridProps> = ({ kpis }) => {
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">{kpi.label}</p>
+                <p className="text-sm font-medium text-muted-foreground mb-1">
+                  {kpi.label}
+                </p>
                 <p className="text-3xl font-bold">{kpi.value}</p>
               </div>
               <div className="text-2xl">{kpi.icon}</div>
