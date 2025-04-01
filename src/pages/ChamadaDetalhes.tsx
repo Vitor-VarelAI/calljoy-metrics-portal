@@ -43,23 +43,14 @@ const ChamadaDetalhes = () => {
           </CardHeader>
           <CardContent>
             <div className="rounded-md border p-4 space-y-4">
-              <div className="h-12 bg-secondary rounded-md flex items-center justify-center text-muted-foreground">
-                Forma de onda do áudio
-              </div>
-              <div className="flex items-center justify-center space-x-4">
-                <Button variant="outline" size="icon" title="Voltar 10 segundos">
-                  <Rewind className="h-4 w-4" />
-                </Button>
-                <Button 
-                  onClick={togglePlayback} 
-                  variant="default" 
-                  size="icon" 
-                  title={isPlaying ? "Pausar" : "Reproduzir"}
-                >
-                  {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                </Button>
-                <Button variant="outline" size="icon" title="Avançar 10 segundos">
-                  <FastForward className="h-4 w-4" />
+              <AudioPlayer 
+                src={`/uploads/call-${id}.mp3`}
+                markers={[
+                  { type: 'critical', timestamp: 85, description: 'Threatening language detected' },
+                  { type: 'violation', timestamp: 145, description: 'Script compliance violation' },
+                  { type: 'positive', timestamp: 192, description: 'Excellent customer service' },
+                ]}
+              />e="h-4 w-4" />
                 </Button>
               </div>
               <div className="text-center text-muted-foreground text-sm">
