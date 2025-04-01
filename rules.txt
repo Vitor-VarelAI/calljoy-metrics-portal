@@ -1,0 +1,148 @@
+# ✅ CallScan – Replit Backend & Integration Spec
+
+This document outlines all the backend and integration tasks for the CallScan project — to be implemented within a Replit-based FastAPI + React (Lovable UI) stack.
+
+---
+
+## 🧩 Project Overview
+
+CallScan is a web platform that:
+- Analyzes call audio (.mp3, .wav) in **European Portuguese**
+- Transcribes via Whisper (local)
+- Analyzes using GPT-3.5-turbo (OpenAI)
+- Outputs:
+  - Call summary
+  - Sentiment analysis
+  - Script compliance check
+  - Critical language detection
+  - Suggestions for agent improvement
+  - HTML + PDF reports
+
+---
+
+## 🔄 Backend Workflow (Processing Pipeline)
+
+### Sequence:
+
+1. **Upload**
+   - Accept `.mp3`, `.wav`, `.xlsx` files
+   - Store locally on Replit or use Replit DB or compatible volume
+   - Return upload status
+
+2. **Transcribe**
+   - Use `faster-whisper` locally
+   - Return timestamped transcription in JSON
+
+3. **Analyze (LLM)**
+   - Use OpenAI GPT-3.5 API
+   - Prompt includes:
+     - Transcription
+     - Custom rules from `/regras`
+   - Output includes:
+     - Natural language summary
+     - Sentiment trend
+     - Compliance matches
+     - Critical word detection
+     - Suggestions for agent improvement
+
+4. **Store & Serve**
+   - Save full result JSON per call ID
+   - Serve via REST API to frontend
+   - Generate:
+     - 📄 PDF Report
+     - 🌐 HTML Feedback Page
+
+---
+
+## 📁 Upload System (Frontend + API)
+
+**Frontend:**
+- Drag & drop area with progress bar
+- Support `.mp3`, `.wav`, `.xlsx`
+- Status per file (Ready / Uploading / Done)
+- "Start Analysis" button triggers backend
+
+**API Endpoint:**
+`POST /upload`
+- Receives multiple files
+- Returns: call ID, status
+
+---
+
+## 🔊 Smart Audio Player (Frontend only)
+
+- Custom audio component with:
+  - Timeline
+  - Alert markers (`critical`, `script`, `positive`)
+  - Tooltip on hover
+  - Jump to marker on click
+
+**Expected Data Format:**
+```json
+{
+  "audioUrl": "...",
+  "duration": "03:12",
+  "markers": [
+    { "time": "01:25", "type": "critical", "label": "Threatening language" },
+    { "time": "02:10", "type": "script", "label": "Policy not mentioned" }
+  ]
+}
+📋 Rules System (Per Call Center)
+Frontend UI already exists. Backend needs:
+
+GET /rules – list current rules
+
+POST /rules – add a new rule
+
+PUT /rules/:id – update a rule
+
+DELETE /rules/:id – remove a rule
+
+Rules are used dynamically in the GPT analysis prompt.
+
+Each rule includes:
+
+text (description)
+
+category (greeting, closure, etc.)
+
+type (required, recommended)
+
+📈 Dashboard & Reports (Optional Phase)
+Dashboard pulls key metrics (calls today, sentiment %, alerts)
+
+Reports are listed by:
+
+Date
+
+Agent
+
+Type (individual, agent-summary, global)
+
+Can be downloaded or viewed in HTML
+
+✅ Immediate Next Steps for Dev
+ Implement file upload endpoint (/upload)
+
+ Connect to local faster-whisper for transcription
+
+ Call GPT API with transcription + rules
+
+ Return structured JSON with full analysis
+
+ (Optional) Generate HTML & PDF from result
+
+ Support GET /call/:id for frontend to fetch analysis
+
+ Define marker data for frontend audio player
+
+⚠️ Notes
+GDPR: All processing must remain within EU (Hetzner)
+
+No external sharing of transcripts or audio
+
+Results must be scoped per call center/account
+
+
+
+
