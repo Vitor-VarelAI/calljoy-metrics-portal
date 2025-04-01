@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 import multer from 'multer';
 import path from 'path';
 import { Call } from '../types';
+import prisma from '../utils/database';
+import { logToFile, logError } from '../utils/logger';
 
 const storage = multer.diskStorage({
   destination: './uploads/',
@@ -62,19 +64,45 @@ export const getCallById = async (req: Request, res: Response) => {
 // Endpoint to register a new call for analysis
 import { logToFile, logError } from '../utils/logger';
 
-export const uploadCall = (req: Request, res: Response) => {
-  upload.single('audio')(req, res, (err) => {
+export const uploadCall = async (req: Request, res: Response) => {
+  upload.single('audio')(req, res, async (err) => {
     if (err) {
       logError(`Upload failed: ${err.message}`);
       return res.status(400).json({ error: err.message });
     }
-    logToFile(`New call upload started with agent ID: ${req.body.agentId}`);
-    
+
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
     const { agentId } = req.body;
+
+    try {
+      // Validate the existence of the Agent
+      const agent = await prisma.agent.findUnique({
+        where: { id: agentId },
+      });
+
+      if (!agent) {
+        return res.status(404).json({ message: "Agent not found" });
+      }
+
+      // Create a new Call record in the database
+      const newCall = await prisma.call.create({
+        data: {
+          agentId,
+          audioUrl: `/uploads/${req.file.filename}`,
+          audioFileName: req.file.originalname,
+          mimeType: req.file.mimetype,
+          duration: 0, // Will be updated after processing
+          processingStatus: 'pending',
+          sentiment: { overall: 'neutral', scores: { positive: 0, neutral: 0, negative: 0 } },
+          scriptCompliance: { items: [], score: 0 },
+          alerts: []
+        },
+      });
+
+      logToFile(`Uploaded new call for agent ${agentId}, Call ID: ${newCall.id}`);
     
     const newCall = await prisma.call.create({
       data: {
