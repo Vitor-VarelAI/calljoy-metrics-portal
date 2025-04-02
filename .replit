@@ -14,3 +14,14 @@ externalPort = 80
 [[ports]]
 localPort = 8081
 externalPort = 8081
+
+[workflows]
+
+[[workflows.workflow]]
+name = "Backend Server"
+author = 34785921
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd server && npm run dev"
