@@ -1,5 +1,6 @@
 import express from 'express';
 import { logToFile, logError } from './utils/logger';
+import cors from 'cors';
 
 process.on('uncaughtException', (error) => {
   logError(error);
@@ -9,7 +10,6 @@ process.on('uncaughtException', (error) => {
 process.on('unhandledRejection', (reason) => {
   logError(reason);
 });
-import cors from 'cors';
 import agentRoutes from './routes/agents';
 import ruleRoutes from './routes/rules';
 import callRoutes from './routes/calls';
