@@ -144,15 +144,38 @@ async function processCall(call: Call) {
     // Get client rules
     const rules = await getRulesForClient(call.clientId);
     
-    // Analyze using CrewAI
-    const analysis = await analyzeCall(transcription, rules);
+    // Initial analysis using CrewAI
+    const crewAnalysis = await analyzeCall(transcription, rules);
     
-    // Update call with analysis results
+    // Enhanced analysis using OpenAI
+    const openaiAnalysis = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "Analyze this call transcript for sentiment, compliance, and potential issues. Format response as JSON."
+        },
+        {
+          role: "user",
+          content: `Transcript: ${transcription}\nRules: ${JSON.stringify(rules)}`
+        }
+      ]
+    });
+    
+    const aiAnalysis = JSON.parse(openaiAnalysis.data.choices[0].message.content);
+    
+    // Merge analyses and update call
     Object.assign(call, {
-      summary: analysis.summary,
-      sentiment: analysis.sentiment,
-      scriptCompliance: analysis.scriptCompliance,
-      alerts: analysis.alerts,
+      summary: aiAnalysis.summary || crewAnalysis.summary,
+      sentiment: {
+        overall: aiAnalysis.sentiment.overall,
+        scores: aiAnalysis.sentiment.scores
+      },
+      scriptCompliance: {
+        items: aiAnalysis.compliance.items,
+        score: aiAnalysis.compliance.score
+      },
+      alerts: aiAnalysis.alerts,
       processingStatus: 'completed'
     });
     
