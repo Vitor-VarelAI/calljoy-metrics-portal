@@ -16,6 +16,7 @@ localPort = 8081
 externalPort = 8081
 
 [workflows]
+runButton = "Frontend Dev"
 
 [[workflows.workflow]]
 name = "Backend Server"
@@ -25,3 +26,12 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd server && npm run dev"
+
+[[workflows.workflow]]
+name = "Frontend Dev"
+author = 34785921
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
