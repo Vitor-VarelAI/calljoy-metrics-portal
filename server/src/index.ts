@@ -1,7 +1,15 @@
-import express from 'express';
-import { logToFile, logError } from './utils/logger';
-import cors from 'cors';
 
+import express from 'express';
+import cors from 'cors';
+import { logToFile, logError } from './utils/logger';
+import agentRoutes from './routes/agents';
+import ruleRoutes from './routes/rules';
+import callRoutes from './routes/calls';
+
+const app = express();
+const port = 5000;
+
+// Error handling for uncaught exceptions
 process.on('uncaughtException', (error) => {
   logError(error);
   process.exit(1);
@@ -10,13 +18,8 @@ process.on('uncaughtException', (error) => {
 process.on('unhandledRejection', (reason) => {
   logError(reason);
 });
-import agentRoutes from './routes/agents';
-import ruleRoutes from './routes/rules';
-import callRoutes from './routes/calls';
 
-const app = express();
-const port = 5000;
-
+// Middleware
 app.use(cors({
   origin: ['http://localhost:8080', 'http://0.0.0.0:8080'],
   credentials: true
@@ -33,19 +36,12 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-import { logToFile, logError } from './utils/logger';
-
-// Global error handler
-app.use((err: Error, req: Request, res: Response, next: Function) => {
+// Global error handler (at the end, after routes)
+app.use((err: Error, req: any, res: any, next: any) => {
   logError(err);
   res.status(500).json({ error: 'Internal server error' });
 });
 
 app.listen(port, '0.0.0.0', () => {
   logToFile(`Server started on port ${port}`);
-});
-
-process.on('uncaughtException', (err) => {
-  logError(`Uncaught Exception: ${err}`);
-  process.exit(1);
 });
