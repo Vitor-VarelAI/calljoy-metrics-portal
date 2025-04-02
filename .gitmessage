@@ -1,0 +1,35 @@
+
+# Commit Message Template for CallScan (Backend)
+#
+# Format: <type>(<scope>): <short summary>
+#
+# Types:
+#   feat     → A new feature
+#   fix      → A bug fix
+#   refactor → Code change that doesn't add or fix, just restructures
+#   test     → Adding or updating tests
+#   docs     → Documentation changes
+#   chore    → Maintenance work (deps, configs, etc.)
+#
+# Scopes:
+#   upload, api, crewai, sentiment, compliance, summary, risk, report, rules
+#
+# Example:
+#   feat(upload): add file validation for audio types
+#   fix(api): handle null transcript in POST /analyze
+#   refactor(crewai): move agents to separate module
+#
+# --------------------------------------------------
+<type>(<scope>): <short, imperative summary>
+
+# Optional body:
+# Use the body to explain what and why, not how.
+# Wrap at 72 characters if needed.
+#
+# For example:
+# This commit adds validation for file types on the upload endpoint.
+# It supports .mp3 and .wav only, and returns 400 for invalid files.
+#
+# Footer (optional for breaking changes or linked issues):
+# BREAKING CHANGE: new auth required for /analyze
+# Closes #14
