@@ -1,0 +1,10 @@
+<div><div><ol></ol></div><div><aside><div><div><span>CallScan</span><span>Análise inteligente de chamadas</span></div></div><nav><ul><li><a href="/"><span>Dashboard</span></a></li><li><a href="/chamadas"><span>Chamadas</span></a></li><li><a href="/upload"><span>Upload</span></a></li><li><a href="/agentes"><span>Agentes</span></a></li><li><a href="/relatorios"><span>Relatórios</span></a></li><li><a href="/regras-call-center"><span>Regras Call Center</span></a></li><li><a href="/configuracoes"><span>Configurações</span></a></li></ul></nav><div><ul><li><button><span>Modo Escuro</span></button></li><li><button><span>Logout</span></button></li></ul></div></aside><div><header><button></button><div></div></header><main><div><div><h1>Configurações</h1><p>Gerencie as preferências e configurações da sua conta</p></div><div><div><h3>Dados da Conta</h3></div><div><div><div><label>Nome da Organização</label><input></div><div><label>ID da Conta</label><input></div><div><label>Localização</label><input></div><div><label>Idioma Padrão</label><input></div></div></div><div><button>Editar</button></div></div><div><div><h3>Preferências do Utilizador</h3></div><div><div><div><label>Nome</label><input></div><div><label>Email</label><input></div></div><div><div><div><label>Notificações</label><p>Receba alertas sobre eventos importantes</p></div><button><span></span></button></div><div><div><label>Tema</label><p>Escolha entre modo claro ou escuro</p></div><button>Modo Escuro</button></div><div><label>Idioma da Interface</label><p>Selecione o idioma para a interface</p><button><span>Português</span></button></div></div></div></div><div><div><h3>Segurança</h3></div><div><div><button>Alterar Password</button></div><div><button>Logout de Todas as Sessões</button></div><div><div><label>Autenticação de Dois Fatores (2FA)</label><p>Aumente a segurança da sua conta</p></div><div>Em breve</div></div></div></div></div></main></div></div></div>
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+    
+    
+  
+
+<span>50%</span><div><div>
+        
+        <span>Hide dock</span>
+      </div></div>
