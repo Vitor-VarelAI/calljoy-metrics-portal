@@ -3,7 +3,7 @@ import express from 'express';
 import {
   getCalls,
   getCallById,
-  registerCall,
+  uploadCall,
   updateCallAnalysis
 } from '../controllers/callController';
 

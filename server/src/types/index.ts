@@ -47,4 +47,7 @@ export interface Rule {
   description: string;
   category: string;
   type: string;
+  clientId?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

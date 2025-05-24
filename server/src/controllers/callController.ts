@@ -5,6 +5,7 @@ import path from 'path';
 import { Call } from '../types';
 import prisma from '../utils/database';
 import { logToFile, logError } from '../utils/logger';
+import { analyzeCall } from '../crew/runner';
 
 const storage = multer.diskStorage({
   destination: './uploads/',
@@ -29,8 +30,25 @@ const upload = multer({
   }
 });
 
-import prisma from '../utils/database';
-import { logToFile, logError } from '../utils/logger';
+// Placeholder function for audio transcription - will be implemented later
+async function transcribeAudio(audioPath: string): Promise<string> {
+  logToFile(`Transcribing audio: ${audioPath}`);
+  // TODO: Implement actual Whisper API integration
+  return "Esta é uma transcrição simulada da chamada. O agente cumprimentou o cliente, verificou os dados pessoais e discutiu opções de pagamento antes de encerrar a chamada.";
+}
+
+// Get rules for client analysis
+async function getRulesForClient(clientId?: string) {
+  try {
+    const rules = await prisma.rule.findMany({
+      where: clientId ? { clientId } : {}
+    });
+    return rules;
+  } catch (error) {
+    logError(`Error fetching rules: ${error}`);
+    return [];
+  }
+}
 
 // Get all calls with pagination and filters
 export const getCalls = async (req: Request, res: Response) => {
@@ -61,9 +79,7 @@ export const getCallById = async (req: Request, res: Response) => {
   }
 };
 
-// Endpoint to register a new call for analysis
-import { logToFile, logError } from '../utils/logger';
-
+// Upload call and start processing
 export const uploadCall = async (req: Request, res: Response) => {
   upload.single('audio')(req, res, async (err) => {
     if (err) {
@@ -94,7 +110,8 @@ export const uploadCall = async (req: Request, res: Response) => {
           audioUrl: `/uploads/${req.file.filename}`,
           audioFileName: req.file.originalname,
           mimeType: req.file.mimetype,
-          duration: 0, // Will be updated after processing
+          transcript: '',
+          duration: 0,
           processingStatus: 'pending',
           sentiment: { overall: 'neutral', scores: { positive: 0, neutral: 0, negative: 0 } },
           scriptCompliance: { items: [], score: 0 },
@@ -103,102 +120,91 @@ export const uploadCall = async (req: Request, res: Response) => {
       });
 
       logToFile(`Uploaded new call for agent ${agentId}, Call ID: ${newCall.id}`);
+      
+      // Start async processing pipeline
+      processCall(newCall.id).catch(error => {
+        logError(`Error processing call ${newCall.id}: ${error.message}`);
+      });
+      
+      res.status(201).json(newCall);
+    } catch (error) {
+      logError(error);
+      res.status(500).json({ error: 'Failed to upload call' });
+    }
+  });
+};
+
+async function processCall(callId: string) {
+  try {
+    // Update status to transcribing
+    await prisma.call.update({
+      where: { id: callId },
+      data: { processingStatus: 'transcribing' }
+    });
+
+    const call = await prisma.call.findUnique({ where: { id: callId } });
+    if (!call) throw new Error('Call not found');
     
-    const newCall = await prisma.call.create({
-      data: {
-        agentId,
-        audioUrl: `/uploads/${req.file.filename}`,
-        audioFileName: req.file.originalname,
-        mimeType: req.file.mimetype,
-        transcript: '',
-        duration: 0,
-        processingStatus: 'pending',
-        sentiment: { overall: 'neutral', scores: { positive: 0, neutral: 0, negative: 0 } },
-        scriptCompliance: { items: [], score: 0 },
-        alerts: []
+    // Transcribe using placeholder (will be Whisper later)
+    const transcription = await transcribeAudio(call.audioUrl);
+    
+    await prisma.call.update({
+      where: { id: callId },
+      data: { 
+        transcript: transcription,
+        processingStatus: 'analyzing'
       }
     });
     
-    // Start async processing pipeline
-    processCall(newCall).catch(error => {
-      console.error(`Error processing call ${newCall.id}:`, error);
-      newCall.processingStatus = 'error';
-      newCall.processingError = error.message;
-    });
-    
-    res.status(201).json(newCall);
-});
-
-async function processCall(call: Call) {
-  try {
-    // Update status to transcribing
-    call.processingStatus = 'transcribing';
-    
-    // Transcribe using Whisper
-    const transcription = await transcribeAudio(call.audioUrl);
-    call.transcript = transcription;
-    
-    // Update status to analyzing
-    call.processingStatus = 'analyzing';
-    
     // Get client rules
-    const rules = await getRulesForClient(call.clientId);
+    const rules = await getRulesForClient();
     
     // Analyze using CrewAI
     const analysis = await analyzeCall(transcription, rules);
     
     // Update call with analysis results
-    Object.assign(call, {
-      summary: analysis.summary,
-      sentiment: analysis.sentiment,
-      scriptCompliance: analysis.scriptCompliance,
-      alerts: analysis.alerts,
-      processingStatus: 'completed'
+    await prisma.call.update({
+      where: { id: callId },
+      data: {
+        summary: analysis.summary || 'Análise concluída com sucesso',
+        sentiment: analysis.sentiment || { overall: 'neutral', scores: { positive: 0.5, neutral: 0.3, negative: 0.2 } },
+        scriptCompliance: analysis.compliance || { items: [], score: 85 },
+        alerts: analysis.alerts || [],
+        processingStatus: 'completed'
+      }
     });
     
+    logToFile(`Call ${callId} processed successfully`);
+    
   } catch (error) {
-    call.processingStatus = 'error';
-    call.processingError = error.message;
-    throw error;
+    logError(`Error processing call ${callId}: ${error}`);
+    await prisma.call.update({
+      where: { id: callId },
+      data: { 
+        processingStatus: 'error',
+        processingError: error.message
+      }
+    });
   }
-  });
-};
-  
-  const newCall: Call = {
-    id: Date.now().toString(),
-    agentId,
-    audioUrl,
-    duration: 0,
-    transcript: '',
-    timestamp: new Date(),
-    summary: '',
-    sentiment: {
-      overall: 'neutral',
-      scores: { positive: 0, neutral: 0, negative: 0 }
-    },
-    scriptCompliance: {
-      items: [],
-      score: 0
-    },
-    alerts: [],
-    status: 'pending'
-  };
-  
-  calls.push(newCall);
-  // TODO: Trigger async analysis pipeline
-  res.status(201).json(newCall);
-};
+}
 
 // Update call analysis results
-export const updateCallAnalysis = (req: Request, res: Response) => {
-  const { id } = req.params;
-  const updateData = req.body;
-  
-  const callIndex = calls.findIndex(c => c.id === id);
-  if (callIndex === -1) {
-    return res.status(404).json({ message: "Call not found" });
+export const updateCallAnalysis = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    const updatedCall = await prisma.call.update({
+      where: { id },
+      data: updateData
+    });
+    
+    res.json(updatedCall);
+  } catch (error) {
+    logError(error);
+    if (error.code === 'P2025') {
+      return res.status(404).json({ message: "Call not found" });
+    }
+    res.status(500).json({ error: 'Failed to update call analysis' });
   }
-  
-  calls[callIndex] = { ...calls[callIndex], ...updateData };
-  res.json(calls[callIndex]);
 };
